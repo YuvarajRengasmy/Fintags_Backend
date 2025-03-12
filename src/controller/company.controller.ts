@@ -7,14 +7,7 @@ import { hashPassword } from "../helper/Encryption";
 
 var activity = "Company"
 
-/**
- * @author Ponjothi S
- * @date 07-09-2023
- * @param {Object} req 
- * @param {Object} res 
- * @param {Function} next  
- * @description This Function is used to create Company.
- */
+
 export let saveCompany = async (req, res, next) => {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
