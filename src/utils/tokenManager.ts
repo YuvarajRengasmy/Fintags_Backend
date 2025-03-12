@@ -27,14 +27,6 @@ export let CreateJWTToken = (data: any = {}) => {
 
 
 
-/**
- * @author Ponjothi S
- * @date 07-09-2023
- * @param {Object} req 
- * @param {Object} res 
- * @param {Function} next  
- * @description This Function is used to Chech the session and Verify the token
- */
 export let checkSession = async (req, res, next) => {
     const token = req.headers['token'];
     if (token) {
