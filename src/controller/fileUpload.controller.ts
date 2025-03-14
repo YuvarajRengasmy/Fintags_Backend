@@ -4,6 +4,7 @@ import { response } from "../helper/commonResponseHandler";
 import { File, FileDocument } from "../model/FileUpload.model";
 import * as TokenManager from "../utils/tokenManager";
 import { hashPassword } from "../helper/Encryption";
+import axios from 'axios';
 
 const activity = "File";
 
@@ -138,5 +139,55 @@ export let getFilteredContact = async (req, res, next) => {
       response(req, res, activity, 'Level-1', 'Get-FilterFile', true, 200, { FileList, FileCount }, clientError.success.fetchedSuccessfully);
   } catch (err: any) {
       response(req, res, activity, 'Level-2', 'Get-FilterFile', false, 500, {}, errorMessage.internalServer, err.message);
+  }
+};
+
+export const getCompanyByRegNo = async (req, res) => {
+  const { regNo } = req.params; // Extract registration number from URL parameters
+  const apiKey = 'AKXFFvrphSvztlj20BNWPzICrnjCrQMEntFbCTGe'; // Replace with your actual API key
+  
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ success: false, errors: errors.array() });
+  }
+
+  try {
+    // Call to the UK Company Information API
+    const response = await axios.get(
+      `https://api.company-information.service.gov.uk/company/${regNo}`,
+      {
+        headers: {
+          Authorization: `Basic ${Buffer.from(apiKey + ':').toString('base64')}`,
+        },
+      }
+    );
+
+    // Assuming the response contains the necessary company details
+    const company = response.data;
+
+    if (!company) {
+      return res.status(404).json({ success: false, message: 'Company not found' });
+    }
+
+    // Send back the company data
+    return res.status(200).json({
+      success: true,
+      message: 'Company details fetched successfully',
+      company: {
+        name: company.company_name,
+        registrationNumber: company.company_number,
+        status: company.company_status,
+        type: company.company_type,
+        address: company.registered_office_address,
+        industry: company.business_activity, // If available
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching company data:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error fetching company data',
+      error: error.message,
+    });
   }
 };
