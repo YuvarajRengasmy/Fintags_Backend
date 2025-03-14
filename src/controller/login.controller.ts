@@ -1,5 +1,5 @@
 import { validationResult } from "express-validator";
-import { hashPassword } from "../helper/Encryption";
+import { hashPassword, } from "../helper/Encryption";
 import { clientError, errorMessage } from "../helper/ErrorMessage";
 import { response, sendEmail } from "../helper/commonResponseHandler";
 import { Company } from "../model/company.model";
@@ -28,20 +28,20 @@ export let loginEmail = async (req, res, next) => {
                     response(req, res, activity, 'Level-3', 'Login-Email', false, 499, {}, clientError.account.inActive);
                 } else if (newHash != result["password"]) {
                     response(req, res, activity, 'Level-3', 'Login-Email', false, 403, {}, "Invalid Password !");
-                } else {
+                }  else {
                     const token = await TokenManager.CreateJWTToken({
-                        companyId: result["_id"],
-                        companyName: result["name"],
+                        id: "_id",
+                        name:"name",
                         loginType: 'company'
                     });
                     const details = {}
-                    details['_id'] = result._id
-                    details['companyName'] = result.name;
+                    details['_id'] = '_id'
+                    details['email'] = 'email';
                     let finalResult = {};
                     finalResult["loginType"] = 'company';
                     finalResult["companyDetails"] = details;
                     finalResult["token"] = token;
-                    response(req, res, activity, 'Level-2', 'Login-Email', true, 200, result, clientError.success.loginSuccess);
+                    response(req, res, activity, 'Level-2', 'Login-Email', true, 200, finalResult, "company Login Successfully");
                 }
             }
             else {
@@ -54,14 +54,8 @@ export let loginEmail = async (req, res, next) => {
 };
 
 
-/**
- * @author Ponjothi S
- * @date 07-09-2023
- * @param {Object} req
- * @param {Object} res
- * @param {Function} next
- * @description This Function is used for Forget Password.
- */
+
+
 export let forgotPassword = async (req, res, next) => {
     const errors = validationResult(req);
     if (errors.isEmpty()) {

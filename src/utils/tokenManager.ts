@@ -3,25 +3,21 @@ import { response } from '../helper/commonResponseHandler';
 import { clientError, errorMessage } from '../helper/ErrorMessage';
 const activity = 'token';
 
-/**
- * @author Ponjothi S
- * @date 07-09-2023
- * @param {Object} req 
- * @param {Object} res 
- * @param {Function} next  
- * @description This Function is used to token creation
- */
+
 
 export let CreateJWTToken = (data: any = {}) => {
     let tokenData = {};
-    if (data && data['companyName']) {
-        tokenData['companyName'] = data['companyName']
+    if (data && data['name']) {
+        tokenData['name'] = data['name']
     }
-    if (data && data['companyId']) {
-        tokenData['companyId'] = data['companyId']
+    if (data && data['loginType']) {
+        tokenData['loginType'] = data['loginType']
     }
-  
-    const token = jwt.sign(tokenData, 'pixaliveworks', { expiresIn: '8h' });
+    if (data && data['id']) {
+        tokenData['id'] = data['id']
+    }
+
+    const token = jwt.sign(tokenData, 'fintags', { expiresIn: '24h' });
     return token;
 }
 
@@ -34,7 +30,7 @@ export let checkSession = async (req, res, next) => {
         const tokenValue = token.split(' ')[1].trim();
         if (headerType.trim() === "Bearer") {
             try {
-                jwt.verify(tokenValue, 'pixalive', function (err, tokendata) {
+                jwt.verify(tokenValue, 'fintags', function (err, tokendata) {
                     if (err) {
                         return res.status(400).json({ message: clientError.token.sessionExpire })
                     }
